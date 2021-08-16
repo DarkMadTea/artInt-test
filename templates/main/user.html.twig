@@ -1,0 +1,60 @@
+{% extends 'main/base.html.twig' %}
+{% block head %}
+    {% block title %} {{ title }} {% endblock %}
+
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="mb-3"><label for="additional_data_address" class="form-label required">Метка</label><input
+                    type="text" id="additional_data_address_not_hidden" name="additional_data[address]"
+                    placeholder="Адрес метки" class="form-control" disabled="disabled"></div>
+        {{ form(form) }}
+        <script type="text/javascript">
+            ymaps.ready(init);
+            function init() {
+                var myMap = new ymaps.Map("map", {
+                        center: [47.2313, 39.7233],
+                        zoom: 8,
+                        controls: []
+                    }, {
+                        searchControlProvider: 'yandex#search'
+                    });
+
+                var searchControl = new ymaps.control.SearchControl({
+                    options: {
+                        provider: 'yandex#search'
+                    }
+                });
+
+                myMap.controls.add(searchControl);
+
+                searchControl.events.add('resultselect', function(e) {
+                    var index = e.get('index');
+                    searchControl.getResult(index).then(function(res) {
+                        let latitude  = res.geometry.getCoordinates()[0]; // получаем координаты найденной точки
+                        let longitude = res.geometry.getCoordinates()[1]; // получаем координаты найденной точки
+                        // document.getElementById("additional_data_address").placeholder = res.geometry.getCoordinates();
+                        document.getElementById("additional_data_address").value = res.geometry.getCoordinates();
+
+                        var myReverseGeocoder = ymaps.geocode( [latitude ,longitude ]);
+                        myReverseGeocoder.then(function (res) {
+                            document.getElementById("additional_data_address_not_hidden").placeholder = res.geoObjects.get(0).properties.get('text');
+                        });
+                    });
+                });
+
+            }
+        </script>
+
+        <div class="container">
+            <h2>Введите адрес проживания на карте</h2>
+            <div id="map" style="height: 600px; margin-top: 20px"></div>
+        </div>
+    </div>
+{% endblock %}
+
+
+
+
+

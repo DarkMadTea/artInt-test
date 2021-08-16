@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+{#        <link rel="icon" href="{{ asset('assets/main/images/angry-regular.svg') }}">#}
+        <title>{% block title %}{% endblock %}</title>
+        {# Run `composer require symfony/webpack-encore-bundle`
+           and uncomment the following Encore helpers to start using Symfony UX #}
+        {% block stylesheets %}
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+        {% endblock %}
+
+        {% block javascripts %}
+            <script src="https://api-maps.yandex.ru/2.1/?apikey=f30e1366-968c-4fb8-8f95-0a2f2669a91c&lang=ru_RU" type="text/javascript"></script>
+            <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" integrity="sha384-eMNCOe7tC1doHpGoWe/6oMVemdAVTMs2xqW4mwXrXsW0L84Iytr2wi5v2QjrP/xp" crossorigin="anonymous"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js" integrity="sha384-cn7l7gDp0eyniUwwAZgrzD06kc/tftFf19TOAs2zVinnD/C7E91j9yyk5//jjpt/" crossorigin="anonymous"></script>
+        {% endblock %}
+    </head>
+    <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            {% set route = app.request.attributes.get('_route') %}
+            <a class="navbar-brand" href="{{ path ('home') }}">Система поиска заявок пользователей</a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            {% if app.user %}
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        {% if is_granted("ROLE_USER") %}
+                            <li class="nav-item">
+                                <a {{ route ==  'user' ? 'class="nav-item nav-link active"' }} class="nav-item nav-link" href="{{ path ('user') }}">Оставить заявку</a>
+                            </li>
+                        {% endif %}
+                        {% if is_granted("ROLE_ADMIN") %}
+                            <li class="nav-item">
+                                <a {{ route ==  'allusers' ? 'class="nav-item nav-link active"' }} class="nav-item nav-link" href="{{ path ('allusers') }}">Все пользователи</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                    <span style="margin-right: 10px">{{ app.user.username }}</span>
+                    <a href="{{path('app_logout')}}" class="btn btn-danger">Выйти</a>
+                </div>
+            {% elseif not app.user %}
+                <div class="buttons">
+                    <a href="{{path('app_register')}}" class="btn btn-success" style="margin-right: 10px">Зарегестрироваться</a>
+                    <a href="{{path('app_login')}}" class="btn btn-success">Войти</a>
+                </div>
+            {% endif %}
+        </div>
+    </nav>
+        {% block body %}{% endblock %}
+    </body>
+</html>
